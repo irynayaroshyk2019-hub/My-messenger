@@ -2,7 +2,8 @@ from flask import Flask, request, jsonify
 
 app = Flask(name)
 
-users = []
+users = {}
+messages = []
 
 
 @app.route("/")
@@ -14,17 +15,59 @@ def home():
 def register():
 
     data = request.json
-    users.append(data)
+
+    phone = data.get("phone")
+    name = data.get("name", "Користувач")
+
+    if not phone:
+        return jsonify({
+            "error": "No phone"
+        }), 400
+
+    users[phone] = {
+        "name": name,
+        "phone": phone
+    }
 
     return jsonify({
-        "status": "registered"
+        "status": "ok",
+        "user": users[phone]
     })
 
 
-@app.route("/users")
-def get_users():
+@app.route("/contacts")
+def contacts():
 
-    return jsonify(users)
+    return jsonify(
+        list(users.values())
+    )
+
+
+@app.route("/send", methods=["POST"])
+def send():
+
+    data = request.json
+
+    messages.append(data)
+
+    return jsonify({
+        "status": "sent"
+    })
+
+
+@app.route("/messages/<phone>")
+def get_messages(phone):
+
+    result = []
+
+    for message in messages:
+        if (
+            message.get("to") == phone
+            or message.get("from") == phone
+        ):
+            result.append(message)
+
+    return jsonify(result)
 
 
 if name == "main":
