@@ -14,7 +14,6 @@ def home():
 def register():
 
     data = request.json
-
     users.append(data)
 
     return jsonify({
@@ -28,7 +27,8 @@ def get_users():
     return jsonify(users)
 
 
-app.run(
-    host="0.0.0.0",
-    port=5000
-)
+if name == "main":
+    app.run(
+        host="0.0.0.0",
+        port=5000
+    )
