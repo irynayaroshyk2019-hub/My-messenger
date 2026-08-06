@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 
 app = Flask("server")
 
-users = {}
+users = []
 messages = []
 
 
@@ -15,24 +15,26 @@ def home():
 def register():
 
     data = request.json
-
     phone = data["phone"]
 
-    users[phone] = {
-        "phone": phone
-    }
+    if phone not in users:
+        users.append(phone)
 
     return jsonify({
-        "status": "registered",
-        "phone": phone
+        "status": "registered"
     })
+
+
+@app.route("/users")
+def get_users():
+
+    return jsonify(users)
 
 
 @app.route("/send", methods=["POST"])
 def send():
 
     data = request.json
-
     messages.append(data)
 
     return jsonify({
